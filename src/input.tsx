@@ -1,4 +1,4 @@
-import React, { ComponentType, PropsWithChildren, Ref, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { ComponentType, Ref, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from './form'
 import { validateRequired } from './validators'
 
@@ -14,7 +14,7 @@ type InputProps<T, W> = {
   required?: boolean
   defaultValue?: Maybe<T>
   onChange?: (value: Maybe<T>) => void
-  wrapper?: ComponentType<WrapperProps & W> | null
+  wrapper?: ComponentType<ComponentProps<any> & W> | null
 }
 
 type ComponentProps<T> = {
@@ -27,15 +27,17 @@ type ComponentProps<T> = {
   setOnValue(key: string, value: any): void
 } & InputProps<T, any>
 
-export type WrapperProps = PropsWithChildren<ComponentProps<any>>
-
-function DefaultWrapperComponent(props: WrapperProps) {
-  return props.children
+export function createInputWrapper<T = {}>(Component: ComponentType<ComponentProps<any> & T>) {
+  return function (props: ComponentProps<any> & T) {
+    return <Component {...props} />
+  }
 }
+
+const DefaultWrapperComponent = createInputWrapper(({ children }) => children as React.ReactElement)
 
 export function createInput<T, C = {}, W = {}>(
   Component: ComponentType<ComponentProps<T> & C>,
-  DefaultWrapper: ComponentType<WrapperProps & W> = DefaultWrapperComponent as ComponentType<WrapperProps & W>
+  DefaultWrapper: ComponentType<ComponentProps<any> & W> = DefaultWrapperComponent
 ) {
   return function <WC = {}>(props: InputProps<T, WC> & C & W & WC) {
     const eventRef = useRef<EventRef<T>>(null)
@@ -101,7 +103,7 @@ export function createInput<T, C = {}, W = {}>(
     const error = useMemo(() => errors[props.name], [errors, props.name])
 
     const Wrapper = useMemo(() => {
-      if (props.wrapper === null) return DefaultWrapperComponent as ComponentType<WrapperProps & W>
+      if (props.wrapper === null) return DefaultWrapperComponent
       if (props.wrapper) return props.wrapper
       return DefaultWrapper
     }, [props.wrapper])

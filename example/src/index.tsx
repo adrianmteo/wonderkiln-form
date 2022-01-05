@@ -1,8 +1,8 @@
-import { createForm, createInput, WrapperProps } from '@wonderkiln/form'
+import { createForm, createInput, createInputWrapper } from '@wonderkiln/form'
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-const Form = createForm(({ children, onSubmit }) => (
+const Form = createForm(({ children, onSubmit, error }) => (
   <form
     onSubmit={(e) => {
       e.preventDefault()
@@ -10,25 +10,28 @@ const Form = createForm(({ children, onSubmit }) => (
     }}
   >
     {children}
+    {!!error && <p style={{ color: 'red' }}>{error.message}</p>}
     <button type="submit">Submit</button>
   </form>
 ))
 
-type Wrapper = { label: string }
+type InputWrapper = { label: string }
 
-function Wrapper({ children, label }: WrapperProps & Wrapper) {
+const InputWrapper = createInputWrapper<InputWrapper>(({ label, children, error }) => {
   return (
     <section>
       <label>{label}</label>
       {children}
+      {!!error && <p style={{ color: 'red' }}>{error.message}</p>}
     </section>
   )
-}
+})
 
-const StringInput = createInput<string, {}, Wrapper>(
-  ({ value, setValue }) => <input value={value ?? ''} onChange={(e) => setValue(e.target.value)} />,
-  Wrapper
-)
+type StringInput = { placeholder?: string; type?: string }
+
+const StringInput = createInput<string, StringInput, InputWrapper>(({ value, setValue, placeholder, type }) => {
+  return <input value={value ?? ''} onChange={(e) => setValue(e.target.value)} placeholder={placeholder} type={type} />
+}, InputWrapper)
 
 function App() {
   return (
@@ -37,14 +40,10 @@ function App() {
         console.log(data)
       }}
     >
-      <StringInput name="email" label="Email" />
+      <StringInput name="email" label="Email" required />
+      <StringInput name="password" label="Password" required type="password" />
     </Form>
   )
 }
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-)
+ReactDOM.render(<App />, document.getElementById('root'))
