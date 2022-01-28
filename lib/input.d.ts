@@ -7,6 +7,7 @@ declare type EventRef<T> = {
 declare type InputProps<T, W> = {
     name: string;
     required?: boolean;
+    disabled?: boolean;
     defaultValue?: Maybe<T>;
     onChange?: (value: Maybe<T>) => void;
     wrapper?: ComponentType<ComponentProps<any> & W> | null;
@@ -14,7 +15,6 @@ declare type InputProps<T, W> = {
 declare type ComponentProps<T> = {
     value: Maybe<T>;
     setValue(value: Maybe<T>): void;
-    disabled?: boolean;
     error?: Error;
     eventRef?: Ref<EventRef<T>>;
     onBlur(): void;
