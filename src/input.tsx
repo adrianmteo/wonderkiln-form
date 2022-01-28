@@ -12,6 +12,7 @@ type EventRef<T> = {
 type InputProps<T, W> = {
   name: string
   required?: boolean
+  disabled?: boolean
   defaultValue?: Maybe<T>
   onChange?: (value: Maybe<T>) => void
   wrapper?: ComponentType<ComponentProps<any> & W> | null
@@ -20,7 +21,6 @@ type InputProps<T, W> = {
 type ComponentProps<T> = {
   value: Maybe<T>
   setValue(value: Maybe<T>): void
-  disabled?: boolean
   error?: Error
   eventRef?: Ref<EventRef<T>>
   onBlur(): void
@@ -114,7 +114,7 @@ export function createInput<T, C = {}, W = {}>(
         value={data}
         setValue={setValue}
         onBlur={onBlur}
-        disabled={loading}
+        disabled={props.disabled || loading}
         error={error}
         eventRef={eventRef}
         setOnValue={setOnValue}
@@ -124,7 +124,7 @@ export function createInput<T, C = {}, W = {}>(
           value={data}
           setValue={setValue}
           onBlur={onBlur}
-          disabled={loading}
+          disabled={props.disabled || loading}
           error={error}
           eventRef={eventRef}
           setOnValue={setOnValue}
