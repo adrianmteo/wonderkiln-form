@@ -2,7 +2,7 @@ import { createForm, createInput, createInputWrapper } from '@wonderkiln/form'
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-const Form = createForm(({ children, onSubmit, error }) => (
+const Form = createForm(({ children, onSubmit, error, loading }) => (
   <form
     onSubmit={(e) => {
       e.preventDefault()
@@ -11,7 +11,9 @@ const Form = createForm(({ children, onSubmit, error }) => (
   >
     {children}
     {!!error && <p style={{ color: 'red' }}>{error.message}</p>}
-    <button type="submit">Submit</button>
+    <button type="submit" disabled={loading}>
+      Submit
+    </button>
   </form>
 ))
 
@@ -29,14 +31,26 @@ const InputWrapper = createInputWrapper<InputWrapper>(({ label, children, error 
 
 type StringInput = { placeholder?: string; type?: string }
 
-const StringInput = createInput<string, StringInput, InputWrapper>(({ value, setValue, placeholder, type }) => {
-  return <input value={value ?? ''} onChange={(e) => setValue(e.target.value)} placeholder={placeholder} type={type} />
-}, InputWrapper)
+const StringInput = createInput<string, StringInput, InputWrapper>(
+  ({ value, setValue, placeholder, type, disabled }) => {
+    return (
+      <input
+        type={type}
+        value={value ?? ''}
+        disabled={disabled}
+        placeholder={placeholder}
+        onChange={(e) => setValue(e.target.value)}
+      />
+    )
+  },
+  InputWrapper
+)
 
 function App() {
   return (
     <Form
-      onSubmit={(data) => {
+      onSubmit={async (data) => {
+        await new Promise((resolve) => setTimeout(resolve, 2000))
         console.log(data)
       }}
     >
